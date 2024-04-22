@@ -1,0 +1,62 @@
+/* General styles */
+.container {
+  font-family: "Arial", sans-serif;
+  background-color: #f7f7f7;
+  margin: auto;
+  display: flex;
+  justify-content: center;
+  padding: 20px;
+}
+
+/* Styling the main container */
+form {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 320px;
+}
+
+h1 {
+  text-align: center;
+  color: #333;
+}
+
+/* Form input fields styling */
+input[type="text"],
+input[type="password"],
+input[type="email"] {
+  width: calc(100% - 20px);
+  padding: 10px;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+/* Styling the submit button */
+input[type="submit"] {
+  width: 100%;
+  padding: 10px;
+  border: none;
+  background-color: #5c67f2;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background-color 0.3s ease;
+}
+
+input[type="submit"]:hover {
+  background-color: #4a54e1;
+}
+
+/* Error message styling */
+.error {
+  color: #d8000c;
+  background-color: #ffd2d2;
+  padding: 10px;
+  margin-top: 10px;
+  border-radius: 4px;
+  text-align: center;
+}
