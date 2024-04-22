@@ -1,12 +1,21 @@
 <?php
 session_start();
 
+// Check for a message and clear it after displaying
+if (isset($_SESSION['message'])) {
+    $message = $_SESSION['message'];
+    unset($_SESSION['message']);
+    echo "<p>$message</p>"; // Display the message
+}
+
+
 if (!isset($_SESSION['teacher_id'])) {
     header("Location: login_teacher.php");
     exit();
 }
 
 include 'db.php'; // Database connection
+$message = ''; // To store messages to display after redirects
 
 // Handle Add Test
 if (isset($_POST['add_test'])) {
@@ -27,6 +36,10 @@ if (isset($_POST['add_test'])) {
     } else {
         echo "<p>Please fill in all fields.</p>";
     }
+    // Redirect to prevent form resubmission
+    $_SESSION['message'] = 'New test added successfully!'; // Set the success message
+    header('Location: teacher_dashboard.php');
+    exit();
 }
 
 // Handle Delete Test
@@ -40,13 +53,21 @@ if (isset($_GET['delete_test'])) {
         echo "<p>Error: " . $stmt->error . "</p>";
     }
     $stmt->close();
+
+     // Redirect to prevent form resubmission
+     $_SESSION['message'] = 'Test deleted successfully!';
+     header('Location: teacher_dashboard.php');
+     exit();
 }
 
-// Handle Add Score
+
+
+
+
 // Handle Add Score
 if (isset($_POST['add_score'])) {
     $rollno = $_POST['rollno'];
-    $batch = $_POST['score_batch'];
+    $batch = $_POST['score_batch'];  // Ensure this matches the input field name
     $testname = $_POST['score_testname'];
     $testid = $_POST['score_testid'];
     $totalmarks = $_POST['totalmarks'];
@@ -64,6 +85,11 @@ if (isset($_POST['add_score'])) {
     } else {
         echo "<p>Error adding score: " . $stmt->error . "</p>";
     }
+    
+    // Redirect to prevent form resubmission
+    $_SESSION['message'] = 'Score added successfully!';
+    header('Location: teacher_dashboard.php');
+    exit();
     $stmt->close();
 }
 
@@ -80,6 +106,10 @@ if (isset($_GET['delete_score'])) {
         echo "<p>Error deleting score: " . $stmt->error . "</p>";
     }
     $stmt->close();
+    // Redirect to prevent form resubmission
+    $_SESSION['message'] = 'Score deleted successfully!';
+    header('Location: teacher_dashboard.php');
+    exit();
 }
 
 
@@ -100,6 +130,9 @@ $stmt = $conn->prepare("SELECT * FROM Tests WHERE createdby = ?");
 $stmt->bind_param("i", $_SESSION['teacher_id']);
 $stmt->execute();
 $tests_result = $stmt->get_result();
+
+
+
 ?>
 
 <!DOCTYPE html>
@@ -114,6 +147,10 @@ $tests_result = $stmt->get_result();
 <body>
     <h1>Welcome, <?php echo $_SESSION['teacher_name']; ?></h1>
 
+<!-- Logout Button -->
+<form action="logout.php" method="post">
+    <input type="submit" value="Logout">
+</form>
     <h2>Create New Test</h2>
     <form action="teacher_dashboard.php" method="post">
         Test Name: <input type="text" name="testname" required><br>
@@ -134,6 +171,7 @@ $tests_result = $stmt->get_result();
     Not Attempted: <input type="number" name="notattempted" required><br>
     <input type="submit" name="add_score" value="Add Score">
 </form>
+
 
 
     <h2>View Scores by Roll Number</h2>
@@ -198,6 +236,7 @@ $tests_result = $stmt->get_result();
     </table>
 </body>
 </html>
+
 
 <?php
 $conn->close();
