@@ -61,37 +61,42 @@ if (isset($_GET['delete_test'])) {
 }
 
 
-
-
-
 // Handle Add Score
 if (isset($_POST['add_score'])) {
     $rollno = $_POST['rollno'];
-    $batch = $_POST['score_batch'];  // Ensure this matches the input field name
+    $batch = $_POST['score_batch'];
     $testname = $_POST['score_testname'];
     $testid = $_POST['score_testid'];
     $totalmarks = $_POST['totalmarks'];
+    $maximumscore = $_POST['maximumscore']; // Retrieve the maximum score from the form
     $rightquestion = $_POST['rightquestion'];
     $wrongquestion = $_POST['wrongquestion'];
     $notattempted = $_POST['notattempted'];
 
     // Calculate percentage dynamically
-    $percentage = ($rightquestion / $totalmarks) * 100;
+    $percentage = ($totalmarks / $maximumscore) * 100; // Updated calculation
 
-    $stmt = $conn->prepare("INSERT INTO TestScores (rollno, batch, testname, testid, totalmarks, rightquestion, wrongquestion, notattempted, percentage) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
-    $stmt->bind_param("isisiiidi", $rollno, $batch, $testname, $testid, $totalmarks, $rightquestion, $wrongquestion, $notattempted, $percentage);
+    // Prepare SQL with the new column
+    $stmt = $conn->prepare("INSERT INTO TestScores (rollno, batch, testname, testid, totalmarks, rightquestion, wrongquestion, notattempted, maximumscore, percentage) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    $stmt->bind_param("isisiiiidi", $rollno, $batch, $testname, $testid, $totalmarks, $rightquestion, $wrongquestion, $notattempted, $maximumscore, $percentage);
+
     if ($stmt->execute()) {
-        echo "<p>Score added successfully!</p>";
+        // Set the success message
+        $_SESSION['message'] = 'Score added successfully!';
     } else {
-        echo "<p>Error adding score: " . $stmt->error . "</p>";
+        // Set the error message
+        $_SESSION['message'] = "Error adding score: " . $stmt->error;
     }
-    
+    $stmt->close();
+
     // Redirect to prevent form resubmission
-    $_SESSION['message'] = 'Score added successfully!';
     header('Location: teacher_dashboard.php');
     exit();
-    $stmt->close();
 }
+
+
+
+
 
 // Handle Delete Score
 if (isset($_GET['delete_score'])) {
@@ -160,12 +165,13 @@ $tests_result = $stmt->get_result();
     </form>
 
     <h2>Add Scores for a Test</h2>
-<form action="teacher_dashboard.php" method="post">
+    <form action="teacher_dashboard.php" method="post">
     Roll No: <input type="text" name="rollno" required><br>
     Batch: <input type="text" name="score_batch" required><br>
     Test Name (for reference): <input type="text" name="score_testname" required><br>
     Test ID: <input type="text" name="score_testid" required><br>
-    Total Marks: <input type="number" name="totalmarks" required><br>
+     Marks Obtained: <input type="number" name="totalmarks" required><br>
+    Maximum Marks: <input type="number" name="maximumscore" required><br> <!-- New field -->
     Right Questions: <input type="number" name="rightquestion" required><br>
     Wrong Questions: <input type="number" name="wrongquestion" required><br>
     Not Attempted: <input type="number" name="notattempted" required><br>
